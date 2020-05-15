@@ -1,9 +1,8 @@
 package Clases;
 
-import jdk.internal.org.objectweb.asm.tree.analysis.Frame;
-
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -24,9 +23,11 @@ public class Game extends Canvas implements Runnable {
 
     //temp
     private BufferedImage player;
+    private Player p;
 
     public void init()
     {
+        requestFocus();
         BufferedImageLoader loader=new BufferedImageLoader();
 
         try{
@@ -37,9 +38,10 @@ public class Game extends Canvas implements Runnable {
             e.printStackTrace();
         }
 
-        SpriteSheet ss=new SpriteSheet(spriteSheet);
-        player= ss.grabImage(1,1,32,32);
+        addKeyListener(new KeyInput(this));
 
+        p =new Player(550,400,this);
+        SpriteSheet ss=new SpriteSheet(spriteSheet);
     }
 
 
@@ -65,8 +67,6 @@ public class Game extends Canvas implements Runnable {
 
         System.exit(1);
     }
-
-
 
     public void run() // runnable game loop
     {
@@ -108,8 +108,7 @@ public class Game extends Canvas implements Runnable {
 
     private void tick()
     {
-
-
+       p.tick();
 
     }
 
@@ -129,12 +128,57 @@ public class Game extends Canvas implements Runnable {
 
         g.drawImage(image,0,0,getWidth(),getHeight(),this);
         g.drawImage(fondo,0,0,getWidth(),getHeight(), this);
-        g.drawImage(player,100,100,this);
+        p.render(g);
         //dibujar
         g.dispose();
         bs.show();
 
     }
+
+    public void keyPressed(KeyEvent e) {
+
+        int key=e.getKeyCode();
+
+        if(key == KeyEvent.VK_RIGHT)
+        {
+            p.setVelX(5);
+        }else if(key == KeyEvent.VK_LEFT)
+        {
+            p.setVelX(-5);
+        }else if(key == KeyEvent.VK_DOWN)
+        {
+            p.setVelY(5);
+        }else if(key == KeyEvent.VK_UP)
+        {
+            p.setVelY(-5);
+        }
+    }
+
+
+    public void keyReleased(KeyEvent e) {
+
+        int key=e.getKeyCode();
+
+        if(key == KeyEvent.VK_RIGHT)
+        {
+            p.setVelX(0);
+        }else if(key == KeyEvent.VK_LEFT)
+        {
+            p.setVelX(0);
+        }else if(key == KeyEvent.VK_DOWN)
+        {
+            p.setVelY(0);
+        }else if(key == KeyEvent.VK_UP)
+        {
+            p.setVelY(0);
+        }
+
+
+    }
+
+
+
+
 
     public static  void main(String args[]){
 
@@ -175,11 +219,10 @@ public class Game extends Canvas implements Runnable {
         frame.add(panel);
         panel.add(label);
 
-
         game.start();
     }
 
-
-
-
+    public BufferedImage getSpriteSheet(){
+    return spriteSheet;
+    }
 }
